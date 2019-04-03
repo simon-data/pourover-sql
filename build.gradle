@@ -1,0 +1,168 @@
+/*
+Copyright 2019-present, Simon Data, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+
+group 'simon'
+
+apply plugin: 'java'
+apply plugin: 'signing'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'net.researchgate.release'
+apply plugin: 'org.ajoberstar.git-publish'
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+mainClassName = 'com.simondata.pouroversql.ExtractorRunner'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://s3.amazonaws.com/redshift-maven-repository/release"
+    }
+}
+
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
+    compile 'org.apache.commons:commons-text:1.6'
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.2'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'com.google.guava:guava:27.0.1-jre'
+    compile group: 'com.ibm.informix', name: 'jdbc', version: '4.10.12'
+    compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '7.0.0.jre8'
+    compile group: 'com.amazon.redshift', name: 'redshift-jdbc42', version: '1.2.10.1009'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.9-rc'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.1'
+    compile group: 'net.snowflake', name: 'snowflake-jdbc', version: '3.6.25'
+    compile group: 'com.syncron.amazonaws', name: 'simba-athena-jdbc-driver', version: '2.0.2'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.2'
+        classpath 'net.researchgate:gradle-release:2.6.0'
+        classpath 'org.ajoberstar:gradle-git-publish:2.1.1'
+    }
+}
+
+release {
+    preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
+    tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
+    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
+    tagTemplate = '${version}'
+    versionPropertyFile = 'gradle.properties'
+    buildTasks = ['build', 'shadowJar']
+    scmAdapters = [net.researchgate.release.GitAdapter]
+    git {
+        requireBranch = 'master'
+        pushToRemote = 'origin'
+        pushToBranchPrefix = ''
+        commitVersionFileOnly = false
+        signTag = false
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'pourover-sql'
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Pour Over SQL'
+                description = 'A flexible SQL querying library'
+                url = 'http://www.github.com/simon-data/pourover-sql'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'chetmancini'
+                        name = 'Chet Mancini'
+                        email = 'chetmancini@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/simon-data/pourover-sql.git'
+                    developerConnection = 'scm:git:ssh://github.com/simon-data/pourover-sql.git'
+                    url = 'http://github.com/simon-data/pourover-sql'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "$buildDir/repos/releases"
+            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+gitPublish {
+    repoUri = 'git@github.com:Radico/pourover-sql.git'
+    referenceRepoUri = System.getProperty("user.dir")
+    branch = 'gh-pages'
+    repoDir = file("$buildDir/git-publish") // defaults to $buildDir/gitPublish
+
+    contents {
+        from 'src/pages'
+        from(javadoc) {
+            into 'api'
+        }
+    }
+}
