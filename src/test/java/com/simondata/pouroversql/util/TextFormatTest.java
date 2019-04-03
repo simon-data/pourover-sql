@@ -17,8 +17,8 @@ package com.simondata.pouroversql.util;
 
 import org.junit.Test;
 
-import static com.simondata.sqlextractor.util.TextFormat.toCamelCase;
-import static com.simondata.sqlextractor.util.TextFormat.toSnakeCase;
+import static com.simondata.pouroversql.util.TextFormat.toCamelCase;
+import static com.simondata.pouroversql.util.TextFormat.toSnakeCase;
 import static org.junit.Assert.assertEquals;
 
 public class TextFormatTest {

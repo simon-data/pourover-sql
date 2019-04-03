@@ -1,6 +1,6 @@
 package com.simondata.pouroversql.clients;
 
-import com.simondata.sqlextractor.writers.KeyCaseFormat;
+import com.simondata.pouroversql.writers.KeyCaseFormat;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
