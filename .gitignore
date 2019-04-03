@@ -4,6 +4,17 @@
 # Log file
 *.log
 
+# JetBrains
+.idea
+
+# Gradle
+.gradle
+gradle/
+
+# Build
+build/
+out/
+
 # BlueJ files
 *.ctxt
 
