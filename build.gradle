@@ -154,7 +154,7 @@ javadoc {
 }
 
 gitPublish {
-    repoUri = 'git@github.com:Radico/pourover-sql.git'
+    repoUri = 'git@github.com:simon-data/pourover-sql.git'
     referenceRepoUri = System.getProperty("user.dir")
     branch = 'gh-pages'
     repoDir = file("$buildDir/git-publish") // defaults to $buildDir/gitPublish
