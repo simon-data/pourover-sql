@@ -46,6 +46,11 @@ gradle javadoc
 ```
 
 ## Usage
+### API Documentation
+
+The Javadoc for Pour Over SQL is available here:
+[http://opensource.simondata.com/pourover-sql/api/](http://opensource.simondata.com/pourover-sql/api/)
+
 ### Use as a library
 
 ```$java
