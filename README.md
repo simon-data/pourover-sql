@@ -106,12 +106,13 @@ however, the preferred method is to use the password console prompt.
 
 ### Supported Databases
 
+* Snowflake: `snowflake`
 * Microsoft SQLServer: `sqlserver`
 * Microsoft Azure (same driver): `azure`
 * MySQL / MariaDB: `mysql`
 * PostgreSQL: `postgresql`
 * Amazon Redshift: `redshift`
-* Athena: `athena`
+* Amazon Athena: `athena`
 * Informix `informix`
 
 In future we may add drivers support for the following:
