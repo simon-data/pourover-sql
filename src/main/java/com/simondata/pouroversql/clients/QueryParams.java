@@ -64,10 +64,10 @@ public class QueryParams implements InputParams {
      * @return the number of rows to retrieve per batch.
      */
     public Integer getFetchSize() {
-        if (fetchSize == null) {
+        if (this.fetchSize == null) {
             return DEFAULT_FETCH_SIZE;
         } else {
-            return fetchSize;
+            return this.fetchSize;
         }
     }
 
@@ -100,7 +100,11 @@ public class QueryParams implements InputParams {
      * @return how often to log rowcount.
      */
     public Integer getLogFrequency() {
-        return this.logFrequency;
+        if (this.logFrequency == null) {
+            return this.logFrequency;
+        } else {
+            return DEFAULT_LOG_FREQUENCY;
+        }
     }
 
     /**
