@@ -111,6 +111,10 @@ public class CSVRowWriter extends FileRowWriter {
                 .collect(Collectors.joining(this.delimiter));
     }
 
+    /**
+     * Write a row represented as a Map to the printwriter as CSV.
+     * @param row the row data to write out.
+     */
     @Override
     public void writeRow(Map<String, Object> row) {
         this.writeHeadersOnce(row);

@@ -51,6 +51,11 @@ public class JsonLRowWriter extends FileRowWriter {
         return this.gson.toJson(input);
     }
 
+    /**
+     * Write a row represented as a Map to the printwriter as Json.
+     * @param row the row data to write out.
+     */
+    @Override
     public void writeRow(Map<String, Object> row) {
         this.writer.println(this.toJson(row));
     }

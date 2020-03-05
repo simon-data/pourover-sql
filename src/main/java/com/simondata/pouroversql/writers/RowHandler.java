@@ -22,10 +22,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.simondata.pouroversql.clients.FormattingParams;
-import com.simondata.pouroversql.util.TextFormat;
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.RowProcessor;
-import org.apache.commons.text.CaseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,12 +40,22 @@ public class RowHandler {
     private int logFrequency;
     private FormattingParams formattingParams;
 
+    /**
+     * Convenience constructor that uses default parameters.
+     * @param writer the writer to use
+     */
     public RowHandler(RowWriter writer) {
         this.writer = writer;
         this.logFrequency = -1;
         this.formattingParams = new FormattingParams();
     }
 
+    /**
+     * Constructor
+     * @param writer the writer to use
+     * @param logFrequency how often to log status updates
+     * @param formattingParams what formatting to apply
+     */
     public RowHandler(RowWriter writer, Integer logFrequency, FormattingParams formattingParams) {
         this(writer);
         if (logFrequency != null) {
@@ -56,6 +64,12 @@ public class RowHandler {
         this.formattingParams = formattingParams;
     }
 
+    /**
+     * Main input
+     * @param rs the ResultSet
+     * @return the number of rows handled.
+     * @throws SQLException
+     */
     public int handle(ResultSet rs) throws SQLException {
         AtomicInteger counter = new AtomicInteger();
         Function<String, String> keyTransform = getFunctionByKeyFormat(this.formattingParams.getKeyCaseFormat());
