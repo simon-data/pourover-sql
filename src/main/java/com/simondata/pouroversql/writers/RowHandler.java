@@ -48,9 +48,11 @@ public class RowHandler {
         this.formattingParams = new FormattingParams();
     }
 
-    public RowHandler(RowWriter writer, int logFrequency, FormattingParams formattingParams) {
+    public RowHandler(RowWriter writer, Integer logFrequency, FormattingParams formattingParams) {
         this(writer);
-        this.logFrequency = logFrequency;
+        if (logFrequency != null) {
+            this.logFrequency = logFrequency;
+        }
         this.formattingParams = formattingParams;
     }
 
