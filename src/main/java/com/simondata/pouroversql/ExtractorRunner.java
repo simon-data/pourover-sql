@@ -27,11 +27,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
-import java.time.*;
-import com.jcraft.jsch.*;
-// import com.jcraft.jzlib.*;
 
 import static com.simondata.pouroversql.util.TextFormat.parseInteger;
+import com.simondata.pouroversql.clients.SFTPClient;
 
 /**
  * <h1>ExtractorRunner</h1>
@@ -144,66 +142,6 @@ public class ExtractorRunner {
         return params;
     }
 
-    public static class progressMonitor implements SftpProgressMonitor{
-        private long max                = 0;
-        private long count              = 0;
-        private long percent            = 0;
-        // private CallbackContext callbacks = null;
-        
-        // If you need send something to the constructor, change this method
-        public progressMonitor() {}
-    
-        public void init(int op, java.lang.String src, java.lang.String dest, long max) {
-            this.max = max;
-            LocalTime time = LocalTime.now();
-            logger.info("starting at " + time + ": 0 of " + max);
-        }
-    
-        public boolean count(long bytes){
-            this.count += bytes;
-            LocalTime time = LocalTime.now();
-            long percentNow = this.count*100/max;
-            if(percentNow>this.percent){
-                this.percent = percentNow;
-    
-                logger.info(time + "progress: " + this.percent + "%"); // Progress 0,0
-            }
-            return(true);
-        }
-    
-        public void end(){
-            LocalTime time = LocalTime.now();
-            logger.info("finished download at " + time);// The process is over
-        }
-    }
-
-    public static void SFTPdownloadFile(SQLParams params, String outputFile, String inputFile) {
-        Session session;
-        try {
-            JSch jsch = new JSch();
-            session = jsch.getSession(params.getUser(), params.getHost());
-            session.setPassword(params.getPassword());
-            
-            java.util.Properties config = new java.util.Properties(); 
-            config.put("StrictHostKeyChecking", "no");
-            config.put("compression.s2c", "zlib@openssh.com,zlib,none");
-            config.put("compression.c2s", "zlib@openssh.com,zlib,none");
-            config.put("compression_level", "9");
-            session.setConfig(config);
-            session.connect();
-            
-            ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
-            sftpChannel.connect();
-            logger.info("I'm connected!");
-            sftpChannel.get(inputFile, outputFile, new progressMonitor());
-            logger.info("Downloaded the file from " + inputFile + " to " + outputFile);
-            sftpChannel.exit();
-            session.disconnect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) {
         configureLogging();
 
@@ -230,8 +168,8 @@ public class ExtractorRunner {
                     logger.info("InputSql: " + inputSql);
                     String outputFile = line.getOptionValue("file", DEFAULT_OUTPUT_FILENAME);
                     logger.info("outputFile: " + outputFile);
-                    // sftpClient.initSession(sqlParams);
-                    SFTPdownloadFile(sqlParams, outputFile, inputSql);
+                    SFTPClient sftpClient = new SFTPClient(sqlParams);
+                    sftpClient.downloadFile(outputFile, inputSql);
                     System.exit(0);
                 } catch (Exception e) {
                     e.printStackTrace();

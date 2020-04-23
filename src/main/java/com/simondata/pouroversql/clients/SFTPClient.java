@@ -15,63 +15,58 @@ limitations under the License.
 
 package com.simondata.pouroversql.clients;
 
-import javax.sql.DataSource;
-import com.mysql.cj.jdbc.MysqlDataSource;
-
 import com.jcraft.jsch.*;
+import java.time.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.simondata.pouroversql.ExtractorRunner;
+import com.simondata.pouroversql.util.ProgressMonitor;
 
 /**
- * <h1>Redshift Client</h1>
- * Provide facilities for querying to Redshift
+ * <h1>SFTP Client</h1>
+ * Provide facilities for accessing SFTP
  *
- * @author  Chet Mancini
- * @since   2019-03-31
+ * @author  Jared Schwantz
+ * @since   2020-04-23
  */
-public class SFTPClient extends AbstractSQLClient {
 
+public class SFTPClient {
     private static final int DEFAULT_PORT = 22;
+    private final Logger logger = LoggerFactory.getLogger(ExtractorRunner.class);
+    protected SQLParams params;
 
     /**
      * Constructor
      * @param params SQLParams for the connection.
      */
     public SFTPClient(SQLParams params) {
-        super(params);
+        this.params = params;
     }
 
-    private String getSFTPURL() {
-        return String.format("sftp://%s:%s/%s",
-                this.params.getHost(), this.params.getPort(DEFAULT_PORT), this.params.getDatabase()
-        );
+    public void downloadFile(String outputFile, String inputFile) {
+        Session session;
+        try {
+            JSch jsch = new JSch();
+            session = jsch.getSession(this.params.getUser(), this.params.getHost());
+            session.setPassword(this.params.getPassword());
+            
+            java.util.Properties config = new java.util.Properties(); 
+            config.put("StrictHostKeyChecking", "no");
+            config.put("compression.s2c", "zlib@openssh.com,zlib,none");
+            config.put("compression.c2s", "zlib@openssh.com,zlib,none");
+            config.put("compression_level", "9");
+            session.setConfig(config);
+            session.connect();
+            
+            ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
+            sftpChannel.connect();
+            logger.info("I'm connected!");
+            sftpChannel.get(inputFile, outputFile, new ProgressMonitor());
+            logger.info("Downloaded the file from " + inputFile + " to " + outputFile);
+            sftpChannel.exit();
+            session.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-    @Override
-    public DataSource initDataSource() {
-        DataSource ds = new MysqlDataSource();
-        return ds;
-    }
-
-    // @Override
-    // public Session initSession() {
-    //     Session session;
-    //     try {
-    //         JSch jsch = new JSch();
-    //         session = jsch.getSession(params.getUser(), params.getHost());
-    //         session.setPassword(params.getPassword());
-    //         session.connect();
-
-    //         ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
-    //         sftpChannel.connect();
-    //     } catch (Exception e) {
-    //         //TODO: handle exception
-    //     }
-    //     return session;
-    // }
-
-    @Override
-    protected String getDriverName() {
-        return "com.amazon.redshift.jdbc42.Driver";
-    }
-
-    // Override QueryToFile
 }
