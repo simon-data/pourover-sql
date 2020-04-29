@@ -72,4 +72,28 @@ public class ClientFactory {
         }
         return client;
     }
+
+    public static SFTPClient makeSFTPClient(String sftpType, SFTPParams params) {
+        SftpEngine engine = SftpEngine.byName(sftpType);
+        return ClientFactory.makeSFTPClient(engine, params);
+    }
+
+    /**
+     * Factory method to build a client by engine type.
+     * @param engine the type of client to build
+     * @param params SQLParams to put in the client
+     * @return SQLClient
+     */
+    public static SFTPClient makeSFTPClient(SftpEngine engine, SFTPParams params) {
+        SFTPClient client = null;
+        switch (engine) {
+            case SFTP:
+                client = new SFTPClient(params);
+                break;
+            default:
+                logger.error("DB type not supported.");
+                break;
+        }
+        return client;
+    }
 }

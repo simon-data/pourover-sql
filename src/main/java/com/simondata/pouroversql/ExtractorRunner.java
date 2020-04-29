@@ -118,14 +118,23 @@ public class ExtractorRunner {
         return sb.toString();
     }
 
-    private static SQLParams getSqlParams(CommandLine commandLine) {
+    private static SQLParams getSqlParams(CommandLine commandLine, ConnectionParams params) {
+        String database = commandLine.getOptionValue("database");
+        return new SQLParams(database, params);
+    }
+
+    private static SFTPParams getSftpParams(CommandLine commandLine, ConnectionParams params) {
+        // allow for adding SFTP specific params
+        return new SFTPParams(params);
+    }
+
+    private static ConnectionParams getConnectionParams(CommandLine commandLine) {
         String user = commandLine.getOptionValue("user");
         String host = commandLine.getOptionValue("host", "localhost");
         Integer port = parseInteger(commandLine.getOptionValue("port"));
-        String database = commandLine.getOptionValue("database");
         String password = getPassword();
         Properties props = commandLine.getOptionProperties("custom");
-        return new SQLParams(host, port, user, password, database, props);
+        return new ConnectionParams(host, port, user, password, props);
     }
 
     private static QueryParams getQueryParams(CommandLine commandLine) {
@@ -148,7 +157,9 @@ public class ExtractorRunner {
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine line = parser.parse(getOptions(), args);
-            SQLParams sqlParams = getSqlParams(line);
+            ConnectionParams connectionParams = getConnectionParams(line);
+            SQLParams sqlParams = getSqlParams(line, connectionParams);
+            SFTPParams sftpParams = getSftpParams(line, connectionParams);
             FormattingParams formattingParams = getFormattingParams(line);
             QueryParams queryParams = getQueryParams(line);
             SqlEngine engine = SqlEngine.byName(line.getOptionValue("type", "SQLSERVER"));
@@ -157,6 +168,7 @@ public class ExtractorRunner {
 
             if (line.hasOption("dry")) {
                 sqlParams.logValues();
+                sftpParams.logValues();
                 queryParams.logValues();
                 formattingParams.logValues();
                 System.exit(0);
@@ -168,9 +180,8 @@ public class ExtractorRunner {
                     logger.info("InputSql: " + inputSql);
                     String outputFile = line.getOptionValue("file", DEFAULT_OUTPUT_FILENAME);
                     logger.info("outputFile: " + outputFile);
-                    SFTPClient sftpClient = new SFTPClient(sqlParams);
-                    sftpClient.downloadFile(outputFile, inputSql);
-                    System.exit(0);
+                    SFTPExtractor sftpExtractor = new SFTPExtractor(sftpParams);
+                    sftpExtractor.downloadFile(outputFile, inputSql);
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error(e.getMessage());
