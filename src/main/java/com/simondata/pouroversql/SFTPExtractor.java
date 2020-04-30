@@ -33,7 +33,7 @@ import com.jcraft.jsch.ChannelSftp;
 /**
  * SFTPExtractor is the primary class to use and is designed for most use cases.
  */
-public class SFTPExtractor {
+public class SFTPExtractor extends AbstractExtractor {
 
     private final static Logger logger = LoggerFactory.getLogger(ExtractorRunner.class);
 
@@ -85,7 +85,7 @@ public class SFTPExtractor {
         this.formattingParams = FormattingParams.getDefaultFormattingParams();
     }
 
-    public void downloadFile(String outputFile, String inputFile) {
+    public void extract(String outputFile, String inputFile) {
         // try {
         //     ChannelSftp sftpChannel = this.sftpClient.openSessionChannelSftp();
         //     sftpChannel.get(inputFile, outputFile, new LogPercentDone());

@@ -91,7 +91,7 @@ public class ClientFactory {
                 client = new SFTPClient(params);
                 break;
             default:
-                logger.error("DB type not supported.");
+                logger.error("SFTP type not supported.");
                 break;
         }
         return client;

@@ -27,7 +27,7 @@ import java.util.function.Function;
 /**
  * SQLExtractor is the primary class to use and is designed for most use cases.
  */
-public class SQLExtractor {
+public class SQLExtractor extends AbstractExtractor {
 
     private final SQLClient sqlClient;
     private FormattingParams formattingParams;

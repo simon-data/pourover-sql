@@ -165,6 +165,7 @@ public class ExtractorRunner {
             SqlEngine engine = SqlEngine.byName(line.getOptionValue("type", "SQLSERVER"));
             FileOutputFormat outputFormat = FileOutputFormat.valueOf(
                     line.getOptionValue("format", "json").toUpperCase());
+            String extractorEngine = null;
 
             if (line.hasOption("dry")) {
                 sqlParams.logValues();
@@ -173,15 +174,20 @@ public class ExtractorRunner {
                 formattingParams.logValues();
                 System.exit(0);
             }
+            // leaving this here until abstracting sqlextractor
             if (line.hasOption("sftp")) {
                 try {
+                    extractorEngine = "sftp";
                     logger.info("Got started with sftp!");
                     String inputSql = line.getOptionValue("sql");
                     logger.info("InputSql: " + inputSql);
                     String outputFile = line.getOptionValue("file", DEFAULT_OUTPUT_FILENAME);
                     logger.info("outputFile: " + outputFile);
-                    SFTPExtractor sftpExtractor = new SFTPExtractor(sftpParams);
-                    sftpExtractor.downloadFile(outputFile, inputSql);
+                    // want to have a paramsHolder to pass through instead of individual items
+                    AbstractExtractor extractor = ExtractorFactory.makeExtractor(
+                        extractorEngine, engine, sqlParams, sftpParams);
+                    // need to abstract outputfile and inputsql
+                    extractor.extract(outputFile, inputSql);
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error(e.getMessage());
