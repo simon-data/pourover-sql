@@ -29,7 +29,6 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 import static com.simondata.pouroversql.util.TextFormat.parseInteger;
-import com.simondata.pouroversql.clients.SFTPClient;
 
 /**
  * <h1>ExtractorRunner</h1>
@@ -69,6 +68,7 @@ public class ExtractorRunner {
         options.addOption("timeout", "timeout", true, "Query Timeout in seconds");
         options.addOption("maxrows", "maxrows", true, "Maximum rows");
         options.addOption("sftp", "sftp", false, "Connecting to SFTP");
+        options.addOption("inputfile", "inputfile", true, "SFTP file to download");
 
         Option customParams = Option.builder("custom")
                 .longOpt("custom")
@@ -162,10 +162,12 @@ public class ExtractorRunner {
             SFTPParams sftpParams = getSftpParams(line, connectionParams);
             FormattingParams formattingParams = getFormattingParams(line);
             QueryParams queryParams = getQueryParams(line);
-            SqlEngine engine = SqlEngine.byName(line.getOptionValue("type", "SQLSERVER"));
+            SqlEngine sqlEngine = SqlEngine.byName(line.getOptionValue("type", "SQLSERVER"));
             FileOutputFormat outputFormat = FileOutputFormat.valueOf(
                     line.getOptionValue("format", "json").toUpperCase());
-            String extractorEngine = null;
+            String extractorEngine = line.hasOption("sftp") ? "sftp" : "sql";
+            String inputSftpFile = line.getOptionValue("inputfile");
+            String outputFile = line.getOptionValue("file", DEFAULT_OUTPUT_FILENAME);
 
             if (line.hasOption("dry")) {
                 sqlParams.logValues();
@@ -174,39 +176,23 @@ public class ExtractorRunner {
                 formattingParams.logValues();
                 System.exit(0);
             }
-            // leaving this here until abstracting sqlextractor
-            if (line.hasOption("sftp")) {
-                try {
-                    extractorEngine = "sftp";
-                    logger.info("Got started with sftp!");
-                    String inputSql = line.getOptionValue("sql");
-                    logger.info("InputSql: " + inputSql);
-                    String outputFile = line.getOptionValue("file", DEFAULT_OUTPUT_FILENAME);
-                    logger.info("outputFile: " + outputFile);
-                    // want to have a paramsHolder to pass through instead of individual items
-                    AbstractExtractor extractor = ExtractorFactory.makeExtractor(
-                        extractorEngine, engine, sqlParams, sftpParams);
-                    // need to abstract outputfile and inputsql
-                    extractor.extract(outputFile, inputSql);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error(e.getMessage());
+
+            try {
+                String inputSqlFilename = line.getOptionValue("sql");
+                String inputSql;
+                if (inputSqlFilename != null) {
+                    inputSql = readSqlFromFile(inputSqlFilename);
+                } else {
+                    inputSql = readSqlFromStdIn();
                 }
-            } else {
-                SQLExtractor sqlExtractor = new SQLExtractor(engine, sqlParams, formattingParams);
-                try {
-                    String inputFilename = line.getOptionValue("sql");
-                    String inputSql;
-                    if (inputFilename != null) {
-                        inputSql = readSqlFromFile(inputFilename);
-                    } else {
-                        inputSql = readSqlFromStdIn();
-                    }
-                    String outputFile = line.getOptionValue("file", DEFAULT_OUTPUT_FILENAME);
-                    sqlExtractor.queryToFile(inputSql, new File(outputFile), outputFormat, queryParams);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                ParamsHolder paramsHolder = new ParamsHolder(
+                    extractorEngine, sqlEngine, sqlParams, sftpParams, formattingParams,
+                    inputSql, inputSftpFile, outputFile, outputFormat, queryParams
+                );
+                AbstractExtractor extractor = ExtractorFactory.makeExtractor(paramsHolder);
+                extractor.extract(paramsHolder);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } catch (ParseException exp) {
             logger.error("Parsing failed.  Reason: " + exp.getMessage());

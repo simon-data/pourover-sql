@@ -27,10 +27,10 @@ import org.slf4j.LoggerFactory;
 public class ExtractorFactory {
     private static final Logger logger = LoggerFactory.getLogger(ExtractorFactory.class);
 
-    public static AbstractExtractor makeExtractor(
-            String extractorType, SqlEngine sqlEngine, SQLParams sqlParams, SFTPParams sftpParams) {
-        ExtractorEngine extractorEngine = ExtractorEngine.byName(extractorType);
-        return ExtractorFactory.makeExtractor(extractorEngine, sqlEngine, sqlParams, sftpParams);
+    public static AbstractExtractor makeExtractor(ParamsHolder paramsHolder) {
+        ExtractorEngine extractorEngine = ExtractorEngine.byName(paramsHolder.getExtractorType());
+        paramsHolder.setExtractorEngine(extractorEngine);
+        return ExtractorFactory.makeExtractor(extractorEngine, paramsHolder);
     }
 
     /**
@@ -42,14 +42,15 @@ public class ExtractorFactory {
      * @return SQLClient
      */
     public static AbstractExtractor makeExtractor(
-            ExtractorEngine extractorEngine, SqlEngine sqlEngine, SQLParams sqlParams, SFTPParams sftpParams) {
+            ExtractorEngine extractorEngine, ParamsHolder paramsHolder) {
         AbstractExtractor extractor = null;
         switch (extractorEngine) {
             case SFTP:
-                extractor = new SFTPExtractor(sftpParams);
+                extractor = new SFTPExtractor(paramsHolder.getSftpParams());
                 break;
             case SQL:
-                extractor = new SQLExtractor(sqlEngine, sqlParams);
+                extractor = new SQLExtractor(paramsHolder.getSqlEngine(), 
+                    paramsHolder.getSqlParams(), paramsHolder.getFormattingParams());
                 break;
             default:
                 logger.error("Extraction type not supported.");

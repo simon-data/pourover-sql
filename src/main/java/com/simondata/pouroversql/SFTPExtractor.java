@@ -17,18 +17,9 @@
 package com.simondata.pouroversql;
 
 import com.simondata.pouroversql.clients.*;
-import com.simondata.pouroversql.writers.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import com.simondata.pouroversql.monitors.LogPercentDone;
-import com.jcraft.jsch.ChannelSftp;
 
 /**
  * SFTPExtractor is the primary class to use and is designed for most use cases.
@@ -85,19 +76,12 @@ public class SFTPExtractor extends AbstractExtractor {
         this.formattingParams = FormattingParams.getDefaultFormattingParams();
     }
 
-    public void extract(String outputFile, String inputFile) {
-        // try {
-        //     ChannelSftp sftpChannel = this.sftpClient.openSessionChannelSftp();
-        //     sftpChannel.get(inputFile, outputFile, new LogPercentDone());
-        //     logger.info("Downloaded the file from " + inputFile + " to " + outputFile);
-        //     this.sftpClient.closeSessionChannelSftp(sftpChannel);
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        // }
+    public void extract(ParamsHolder paramsHolder) {
         try {
-            this.sftpClient.downloadFile(outputFile, inputFile);
+            this.sftpClient.downloadFile(paramsHolder.getOutputFile(), paramsHolder.getInputSftpFile());
         } catch (Exception e) {
-            //TODO: handle exception
+            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 }

@@ -16,13 +16,7 @@
 
 package com.simondata.pouroversql;
 
-// import com.simondata.pouroversql.clients.*;
-// import com.simondata.pouroversql.writers.*;
-
-// import java.io.File;
-// import java.util.List;
-// import java.util.Map;
-// import java.util.function.Function;
+import com.simondata.pouroversql.clients.*;
 
 /**
  * AbstractExtractor is the primary class and used as a wrapper.
@@ -32,11 +26,7 @@ public class AbstractExtractor {
     /**
      * Constructor
      */
-    public void extract() {
-
-    }
-    // temporary until abstracting more
-    public void extract(String input, String output) {
+    public void extract(ParamsHolder paramsHolder) {
 
     }
 }

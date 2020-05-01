@@ -33,6 +33,7 @@ public class SFTPClient {
     private final Logger logger = LoggerFactory.getLogger(SFTPClient.class);
     protected SFTPParams params;
     protected Session sftpSession;
+    protected ChannelSftp sftpChannel;
 
     /**
      * Constructor
@@ -95,9 +96,9 @@ public class SFTPClient {
         return sftpChannel;
     }
 
-    public void closeSessionChannelSftp(ChannelSftp sftpChannel) {
+    public void closeSessionChannelSftp() {
         try {
-            sftpChannel.exit();
+            this.sftpChannel.exit();
             this.sftpSession.disconnect();
             this.sftpSession = null;
         } catch (Exception e) {
@@ -108,11 +109,13 @@ public class SFTPClient {
     public void downloadFile(String outputFile, String inputFile) {
         try {
             ChannelSftp sftpChannel = this.openSessionChannelSftp();
-            sftpChannel.get(inputFile, outputFile, new LogPercentDone());
+            this.sftpChannel = sftpChannel;
+            this.sftpChannel.get(inputFile, outputFile, new LogPercentDone());
             logger.info("Downloaded the file from " + inputFile + " to " + outputFile);
-            this.closeSessionChannelSftp(sftpChannel);
+            this.closeSessionChannelSftp();
         } catch (Exception e) {
             e.printStackTrace();
+            this.closeSessionChannelSftp();
         }
     }
 }

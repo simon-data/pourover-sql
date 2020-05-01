@@ -177,4 +177,11 @@ public class SQLExtractor extends AbstractExtractor {
         }
         return file;
     }
+
+    public void extract(ParamsHolder paramsHolder) {
+        queryToFile(
+            paramsHolder.getInputSql(), new File(paramsHolder.getOutputFile()),
+            paramsHolder.getOutputFormat(), paramsHolder.getQueryParams()
+        );
+    }
 }

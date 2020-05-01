@@ -34,6 +34,7 @@ public enum ExtractorEngine {
                 break;
             case "SQL":
                 result = SQL.name();
+                break;
             default:
                 result = name.toUpperCase();
                 break;
