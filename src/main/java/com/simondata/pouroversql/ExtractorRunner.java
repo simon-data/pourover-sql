@@ -69,6 +69,8 @@ public class ExtractorRunner {
         options.addOption("maxrows", "maxrows", true, "Maximum rows");
         options.addOption("sftp", "sftp", false, "Connecting to SFTP");
         options.addOption("inputfile", "inputfile", true, "SFTP file to download");
+        options.addOption("compress", "compress", false, "Compress files during SFTP transport");
+        options.addOption("checkhost", "checkhost", false, "Use strict host key checking for SFTP connection");
 
         Option customParams = Option.builder("custom")
                 .longOpt("custom")
@@ -120,12 +122,13 @@ public class ExtractorRunner {
 
     private static SQLParams getSqlParams(CommandLine commandLine, ConnectionParams params) {
         String database = commandLine.getOptionValue("database");
-        return new SQLParams(database, params);
+        return new SQLParams(params, database);
     }
 
     private static SFTPParams getSftpParams(CommandLine commandLine, ConnectionParams params) {
-        // allow for adding SFTP specific params
-        return new SFTPParams(params);
+        Boolean sftpCompression = commandLine.hasOption("compress");
+        Boolean checkHostKey = commandLine.hasOption("checkhost");
+        return new SFTPParams(params, sftpCompression, checkHostKey);
     }
 
     private static ConnectionParams getConnectionParams(CommandLine commandLine) {
@@ -190,7 +193,7 @@ public class ExtractorRunner {
                     inputSql, inputSftpFile, outputFile, outputFormat, queryParams
                 );
                 AbstractExtractor extractor = ExtractorFactory.makeExtractor(paramsHolder);
-                extractor.extract(paramsHolder);
+                extractor.extract();
             } catch (IOException e) {
                 e.printStackTrace();
             }

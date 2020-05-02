@@ -18,7 +18,7 @@ package com.simondata.pouroversql.clients;
 import com.jcraft.jsch.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.simondata.pouroversql.monitors.LogPercentDone;
+import com.simondata.pouroversql.monitors.*;
 
 /**
  * <h1>SFTP Client</h1>
@@ -49,10 +49,12 @@ public class SFTPClient {
         session.setPassword(this.params.getPassword());
         
         java.util.Properties config = new java.util.Properties(); 
-        config.put("StrictHostKeyChecking", "no");
-        config.put("compression.s2c", "zlib@openssh.com,zlib,none");
-        config.put("compression.c2s", "zlib@openssh.com,zlib,none");
-        config.put("compression_level", "9");
+        config.put("StrictHostKeyChecking", Boolean.toString(this.params.getCheckHostKey()));
+        if (this.params.getSftpCompression()) {
+            config.put("compression.s2c", "zlib@openssh.com,zlib,none");
+            config.put("compression.c2s", "zlib@openssh.com,zlib,none");
+            config.put("compression_level", "9");
+        }
         session.setConfig(config);
         
         return session;
@@ -63,7 +65,7 @@ public class SFTPClient {
 
         JSch jsch = new JSch();
         try {
-            session = jsch.getSession(this.params.getUser(), this.params.getHost());
+            session = jsch.getSession(this.params.getUser(), this.params.getHost(), this.params.getPort(DEFAULT_PORT));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,7 +77,7 @@ public class SFTPClient {
         try {
             sftpChannel = (ChannelSftp) session.openChannel("sftp");
             sftpChannel.connect();
-            logger.info("I'm connected!");
+            logger.info("SFTP connected!");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,16 +103,17 @@ public class SFTPClient {
             this.sftpChannel.exit();
             this.sftpSession.disconnect();
             this.sftpSession = null;
+            logger.info("SFTP disconnected.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void downloadFile(String outputFile, String inputFile) {
+    public void downloadFile(String inputFile, String outputFile) {
         try {
             ChannelSftp sftpChannel = this.openSessionChannelSftp();
             this.sftpChannel = sftpChannel;
-            this.sftpChannel.get(inputFile, outputFile, new LogPercentDone());
+            this.sftpChannel.get(inputFile, outputFile, new SFTPLogPercentDone());
             logger.info("Downloaded the file from " + inputFile + " to " + outputFile);
             this.closeSessionChannelSftp();
         } catch (Exception e) {

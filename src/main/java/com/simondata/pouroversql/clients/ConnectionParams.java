@@ -24,8 +24,8 @@ import java.util.Properties;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 /**
- * SQLParams
- * SQLParams are provided to the SQL client and are used in setting up an initial connection.
+ * ConnectionParams
+ * ConnectionParams are provided to the client and are used in setting up an initial connection.
  * They will be reused as long as the client is in use.
  *
  * @author Chet Mancini

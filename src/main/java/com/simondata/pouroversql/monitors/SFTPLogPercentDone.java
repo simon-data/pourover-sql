@@ -5,13 +5,13 @@ import java.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LogPercentDone implements SftpProgressMonitor{
-    private final Logger logger = LoggerFactory.getLogger(LogPercentDone.class);
+public class SFTPLogPercentDone implements SftpProgressMonitor{
+    private final Logger logger = LoggerFactory.getLogger(SFTPLogPercentDone.class);
     private long total = 0;
     private long completed = 0;
     private long percent = 0;
     
-    public LogPercentDone() {}
+    public SFTPLogPercentDone() {}
 
     public void init(int op, String src, String dest, long max) {
         this.total = max;

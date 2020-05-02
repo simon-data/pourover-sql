@@ -29,7 +29,7 @@ public class SFTPExtractor extends AbstractExtractor {
     private final static Logger logger = LoggerFactory.getLogger(ExtractorRunner.class);
 
     private final SFTPClient sftpClient;
-    private FormattingParams formattingParams;
+    private ParamsHolder paramsHolder;
 
     /**
      * Constructor
@@ -42,29 +42,16 @@ public class SFTPExtractor extends AbstractExtractor {
             String host, Integer port, String username, String password
     ) {
         this(
-                new SFTPParams(host, port, username, password),
-                FormattingParams.getDefaultFormattingParams()
+                new SFTPParams(host, port, username, password)
         );
     }
 
     /**
-     * Constructor
-     * @param engine the SFTPEngine to use
+     * Primary constructor
      * @param sftpParams the SFTPParams to use when building the connection.
      */
     public SFTPExtractor(SFTPParams sftpParams) {
-        this(sftpParams, FormattingParams.getDefaultFormattingParams());
-    }
-
-    /**
-     * Primary constructor
-     * @param engine the SFTPEngine to use
-     * @param sftpParams the SFTPParams to use when building the connection.
-     * @param formattingParams the FormattingParams to use for formatting the output.
-     */
-    public SFTPExtractor(SFTPParams sftpParams, FormattingParams formattingParams) {
         this.sftpClient = ClientFactory.makeSFTPClient("sftp", sftpParams);
-        this.formattingParams = formattingParams;
     }
 
     /**
@@ -73,12 +60,27 @@ public class SFTPExtractor extends AbstractExtractor {
      */
     public SFTPExtractor(SFTPClient sftpClient) {
         this.sftpClient = sftpClient;
-        this.formattingParams = FormattingParams.getDefaultFormattingParams();
     }
 
-    public void extract(ParamsHolder paramsHolder) {
+    public SFTPExtractor(ParamsHolder paramsHolder) {
+        this(paramsHolder.getSftpParams());
+        this.paramsHolder = paramsHolder;
+    }
+
+    public void extract() {
         try {
-            this.sftpClient.downloadFile(paramsHolder.getOutputFile(), paramsHolder.getInputSftpFile());
+            this.sftpClient.downloadFile(
+                this.paramsHolder.getInputSftpFile(),
+                this.paramsHolder.getOutputFile());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void extract(String inputFile, String outputFile) {
+        try {
+            this.sftpClient.downloadFile(inputFile, outputFile);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

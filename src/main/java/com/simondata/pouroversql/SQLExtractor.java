@@ -31,6 +31,7 @@ public class SQLExtractor extends AbstractExtractor {
 
     private final SQLClient sqlClient;
     private FormattingParams formattingParams;
+    private ParamsHolder paramsHolder;
 
     /**
      * Constructor
@@ -78,6 +79,11 @@ public class SQLExtractor extends AbstractExtractor {
     public SQLExtractor(SQLClient sqlClient) {
         this.sqlClient = sqlClient;
         this.formattingParams = FormattingParams.getDefaultFormattingParams();
+    }
+
+    public SQLExtractor(ParamsHolder paramsHolder) {
+        this(paramsHolder.getSqlEngine(), paramsHolder.getSqlParams(), paramsHolder.getFormattingParams());
+        this.paramsHolder = paramsHolder;
     }
 
     /**
@@ -178,10 +184,15 @@ public class SQLExtractor extends AbstractExtractor {
         return file;
     }
 
-    public void extract(ParamsHolder paramsHolder) {
+    public void extract() {
         queryToFile(
-            paramsHolder.getInputSql(), new File(paramsHolder.getOutputFile()),
-            paramsHolder.getOutputFormat(), paramsHolder.getQueryParams()
+            this.paramsHolder.getInputSql(), new File(this.paramsHolder.getOutputFile()),
+            this.paramsHolder.getOutputFormat(), this.paramsHolder.getQueryParams()
         );
+    }
+
+    public void extract(String inputSql, String outputFile,
+            FileOutputFormat outputFormat, QueryParams queryParams) {
+        queryToFile(inputSql, new File(outputFile), outputFormat, queryParams);
     }
 }

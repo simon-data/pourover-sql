@@ -36,21 +36,18 @@ public class ExtractorFactory {
     /**
      * Factory method to build an extractor by engine type.
      * @param extractorEngine the type of extractor to build
-     * @param sqlEngine the type of sqlEngine to build
-     * @param sqlParams SQLParams to put in the client
-     * @param sftpParams SFTPParams to put in the client
-     * @return SQLClient
+     * @param paramsHolder params to pass to create extractors/clients
+     * @return AbstractExtractor
      */
     public static AbstractExtractor makeExtractor(
             ExtractorEngine extractorEngine, ParamsHolder paramsHolder) {
         AbstractExtractor extractor = null;
         switch (extractorEngine) {
             case SFTP:
-                extractor = new SFTPExtractor(paramsHolder.getSftpParams());
+                extractor = new SFTPExtractor(paramsHolder);
                 break;
             case SQL:
-                extractor = new SQLExtractor(paramsHolder.getSqlEngine(), 
-                    paramsHolder.getSqlParams(), paramsHolder.getFormattingParams());
+                extractor = new SQLExtractor(paramsHolder);
                 break;
             default:
                 logger.error("Extraction type not supported.");

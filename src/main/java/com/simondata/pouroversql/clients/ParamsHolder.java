@@ -57,7 +57,7 @@ public class ParamsHolder {
         this.queryParams = queryParams;
     }
 
-    // Skipping setting variables for now
+    // Skipping setting most variables for now
     public String getExtractorType() {
         return this.extractorType;
     }

@@ -16,8 +16,6 @@
 
 package com.simondata.pouroversql;
 
-import com.simondata.pouroversql.clients.*;
-
 /**
  * AbstractExtractor is the primary class and used as a wrapper.
  */
@@ -26,7 +24,7 @@ public class AbstractExtractor {
     /**
      * Constructor
      */
-    public void extract(ParamsHolder paramsHolder) {
+    public void extract() {
 
     }
 }

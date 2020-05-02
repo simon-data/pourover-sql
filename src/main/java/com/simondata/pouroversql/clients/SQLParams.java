@@ -48,7 +48,7 @@ public class SQLParams extends ConnectionParams {
         this.database = database;
     }
 
-    public SQLParams(String database, ConnectionParams params) {
+    public SQLParams(ConnectionParams params, String database) {
         super(params);
         this.database = database;
     }

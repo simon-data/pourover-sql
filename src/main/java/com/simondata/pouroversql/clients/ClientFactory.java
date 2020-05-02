@@ -81,8 +81,8 @@ public class ClientFactory {
     /**
      * Factory method to build a client by engine type.
      * @param engine the type of client to build
-     * @param params SQLParams to put in the client
-     * @return SQLClient
+     * @param params SFTPParams to put in the client
+     * @return SFTPClient
      */
     public static SFTPClient makeSFTPClient(SftpEngine engine, SFTPParams params) {
         SFTPClient client = null;
