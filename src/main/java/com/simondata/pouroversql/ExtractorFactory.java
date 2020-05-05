@@ -16,18 +16,12 @@ package com.simondata.pouroversql;
 
 import com.simondata.pouroversql.clients.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * ExtractorFactory
- *
- * Factory class to build the correct type of Extractor based on input.
+ * Factory to create Extractor instances
  */
 public class ExtractorFactory {
-    private static final Logger logger = LoggerFactory.getLogger(ExtractorFactory.class);
 
-    public static AbstractExtractor makeExtractor(ParamsHolder paramsHolder) {
+    public static AbstractExtractor create(ParamsHolder paramsHolder) {
         ExtractorEngine extractorEngine = ExtractorEngine.byName(paramsHolder.getExtractorType());
         paramsHolder.setExtractorEngine(extractorEngine);
         return ExtractorFactory.makeExtractor(extractorEngine, paramsHolder);
@@ -50,8 +44,7 @@ public class ExtractorFactory {
                 extractor = new SQLExtractor(paramsHolder);
                 break;
             default:
-                logger.error("Extraction type not supported.");
-                break;
+                throw new AssertionError("Extraction type not supported.");
         }
         return extractor;
     }

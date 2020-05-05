@@ -32,34 +32,11 @@ public class SFTPExtractor extends AbstractExtractor {
     private ParamsHolder paramsHolder;
 
     /**
-     * Constructor
-     * @param host the server to connect to.
-     * @param port the server port to connect to.
-     * @param username the user to connect as.
-     * @param password the user's password to connect with.
-     */
-    public SFTPExtractor(
-            String host, Integer port, String username, String password
-    ) {
-        this(
-                new SFTPParams(host, port, username, password)
-        );
-    }
-
-    /**
      * Primary constructor
      * @param sftpParams the SFTPParams to use when building the connection.
      */
-    public SFTPExtractor(SFTPParams sftpParams) {
+    private SFTPExtractor(SFTPParams sftpParams) {
         this.sftpClient = ClientFactory.makeSFTPClient("sftp", sftpParams);
-    }
-
-    /**
-     * If you need to implement your own SFTPClient
-     * @param sftpClient an existing SFTPClient that wraps a connection.
-     */
-    public SFTPExtractor(SFTPClient sftpClient) {
-        this.sftpClient = sftpClient;
     }
 
     public SFTPExtractor(ParamsHolder paramsHolder) {
@@ -68,17 +45,12 @@ public class SFTPExtractor extends AbstractExtractor {
     }
 
     public void extract() {
-        try {
-            this.sftpClient.downloadFile(
+            this.extract(
                 this.paramsHolder.getInputSftpFile(),
                 this.paramsHolder.getOutputFile());
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
     }
 
-    public void extract(String inputFile, String outputFile) {
+    private void extract(String inputFile, String outputFile) {
         try {
             this.sftpClient.downloadFile(inputFile, outputFile);
         } catch (Exception e) {

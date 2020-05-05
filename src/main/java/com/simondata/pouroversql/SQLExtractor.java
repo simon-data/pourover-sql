@@ -42,24 +42,6 @@ public class SQLExtractor extends AbstractExtractor {
      * @param password the user's password to connect with.
      * @param database the database to use for the queries.
      */
-    public SQLExtractor(
-            SqlEngine engine, String host, Integer port, String database, String username, String password
-    ) {
-        this(
-                engine,
-                new SQLParams(host, port, username, password, database),
-                FormattingParams.getDefaultFormattingParams()
-        );
-    }
-
-    /**
-     * Constructor
-     * @param engine the SQLEngine to use
-     * @param sqlParams the SQLParams to use when building the connection.
-     */
-    public SQLExtractor(SqlEngine engine, SQLParams sqlParams) {
-        this(engine, sqlParams, FormattingParams.getDefaultFormattingParams());
-    }
 
     /**
      * Primary constructor
@@ -67,18 +49,9 @@ public class SQLExtractor extends AbstractExtractor {
      * @param sqlParams the SQLParams to use when building the connection.
      * @param formattingParams the FormattingParams to use for formatting the output.
      */
-    public SQLExtractor(SqlEngine engine, SQLParams sqlParams, FormattingParams formattingParams) {
+    private SQLExtractor(SqlEngine engine, SQLParams sqlParams, FormattingParams formattingParams) {
         this.sqlClient = ClientFactory.makeSQLClient(engine, sqlParams);
         this.formattingParams = formattingParams;
-    }
-
-    /**
-     * If you need to implement your own SQLClient
-     * @param sqlClient an existing SQLClient that wraps a connection.
-     */
-    public SQLExtractor(SQLClient sqlClient) {
-        this.sqlClient = sqlClient;
-        this.formattingParams = FormattingParams.getDefaultFormattingParams();
     }
 
     public SQLExtractor(ParamsHolder paramsHolder) {
@@ -185,13 +158,13 @@ public class SQLExtractor extends AbstractExtractor {
     }
 
     public void extract() {
-        queryToFile(
-            this.paramsHolder.getInputSql(), new File(this.paramsHolder.getOutputFile()),
+        this.extract(
+            this.paramsHolder.getInputSql(), this.paramsHolder.getOutputFile(),
             this.paramsHolder.getOutputFormat(), this.paramsHolder.getQueryParams()
         );
     }
 
-    public void extract(String inputSql, String outputFile,
+    private void extract(String inputSql, String outputFile,
             FileOutputFormat outputFormat, QueryParams queryParams) {
         queryToFile(inputSql, new File(outputFile), outputFormat, queryParams);
     }

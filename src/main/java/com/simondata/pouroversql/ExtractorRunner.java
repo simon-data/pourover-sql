@@ -192,7 +192,7 @@ public class ExtractorRunner {
                     extractorEngine, sqlEngine, sqlParams, sftpParams, formattingParams,
                     inputSql, inputSftpFile, outputFile, outputFormat, queryParams
                 );
-                AbstractExtractor extractor = ExtractorFactory.makeExtractor(paramsHolder);
+                AbstractExtractor extractor = ExtractorFactory.create(paramsHolder);
                 extractor.extract();
             } catch (IOException e) {
                 e.printStackTrace();

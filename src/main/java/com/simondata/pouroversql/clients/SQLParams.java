@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-// import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-
 /**
  * SQLParams
  * SQLParams are provided to the SQL client and are used in setting up an initial connection.

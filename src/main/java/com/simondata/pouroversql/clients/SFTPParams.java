@@ -19,8 +19,6 @@ package com.simondata.pouroversql.clients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
-
 // import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 /**
@@ -37,15 +35,6 @@ public class SFTPParams extends ConnectionParams {
 
     private Boolean sftpCompression;
     private Boolean checkHostKey;
-
-    public SFTPParams(String host, Integer port, String user, String password) {
-        super(host, port, user, password);
-    }
-
-    public SFTPParams(
-            String host, Integer port, String user, String password, Properties customProperties) {
-        super(host, port, user, password, customProperties);
-    }
 
     public SFTPParams(ConnectionParams params, Boolean sftpCompression, Boolean checkHostKey) {
         super(params);

@@ -84,7 +84,7 @@ public class SFTPClient {
         return sftpChannel;
     }
 
-    public ChannelSftp openSessionChannelSftp() {
+    protected ChannelSftp openSessionChannelSftp() {
         ChannelSftp sftpChannel = null;
         try {
             Session session = initSession();
@@ -98,7 +98,7 @@ public class SFTPClient {
         return sftpChannel;
     }
 
-    public void closeSessionChannelSftp() {
+    protected void closeSessionChannelSftp() {
         try {
             this.sftpChannel.exit();
             this.sftpSession.disconnect();

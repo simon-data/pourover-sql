@@ -44,9 +44,7 @@ public enum ExtractorEngine {
 
     /**
      * Safer version of converting a string to enum.
-     * Resiliant against differences in common names (MySQL vs MariaDB)
-     * or Postgres vs Postgresql.
-     * Consistent naming pattern with SQL engine for now for future use.
+     * Consistent usage pattern with SQL engine for now for future use.
      * Case insensitive
      * @param name the String name of the db type to parse.
      * @return The SQLEngine that matches the given name.

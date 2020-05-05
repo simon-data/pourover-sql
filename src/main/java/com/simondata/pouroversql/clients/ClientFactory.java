@@ -73,26 +73,21 @@ public class ClientFactory {
         return client;
     }
 
-    public static SFTPClient makeSFTPClient(String sftpType, SFTPParams params) {
-        SftpEngine engine = SftpEngine.byName(sftpType);
-        return ClientFactory.makeSFTPClient(engine, params);
-    }
-
     /**
      * Factory method to build a client by engine type.
      * @param engine the type of client to build
      * @param params SFTPParams to put in the client
      * @return SFTPClient
      */
-    public static SFTPClient makeSFTPClient(SftpEngine engine, SFTPParams params) {
+    public static SFTPClient makeSFTPClient(String sftpType, SFTPParams params) {
+        SftpEngine engine = SftpEngine.byName(sftpType);
         SFTPClient client = null;
         switch (engine) {
             case SFTP:
                 client = new SFTPClient(params);
                 break;
             default:
-                logger.error("SFTP type not supported.");
-                break;
+                throw new AssertionError("SFTP type not supported.");
         }
         return client;
     }
